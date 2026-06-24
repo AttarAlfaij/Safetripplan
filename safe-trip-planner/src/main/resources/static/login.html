@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Safe Trip Planner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: radial-gradient(circle, #dff6ff, #f5faff);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            width: 350px;
+        }
+
+        .panel-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .panel-sub {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .github-btn {
+            display: block;
+            padding: 12px;
+            border-radius: 8px;
+            background: #24292e;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .github-btn:hover {
+            background: black;
+            transform: translateY(-2px);
+        }
+
+        .msg {
+            margin-top: 15px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="auth-card">
+
+    <div class="panel active">
+        <div class="panel-title">Welcome to Safe Trip 👋</div>
+        <div class="panel-sub">Login with GitHub to continue</div>
+
+        <a href="/oauth2/authorization/github" class="github-btn">
+            Continue with GitHub
+        </a>
+
+        <div class="msg">No password needed</div>
+    </div>
+
+</div>
+
+</body>
+
+</html>
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Login | Safe Trip Planner</title>-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <link rel="preconnect" href="https://fonts.googleapis.com">-->
+<!--    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>-->
+<!--    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"-->
+<!--        rel="stylesheet">-->
+
+<!--    <style>-->
+<!--        :root {-->
+<!--            &#45;&#45;primary: #00b8d8;-->
+<!--            &#45;&#45;primary-dark: #0086a0;-->
+<!--            &#45;&#45;accent: #00c9a7;-->
+<!--            &#45;&#45;text-main: #0f172a;-->
+<!--            &#45;&#45;text-muted: #6b7280;-->
+<!--            &#45;&#45;card-bg: #ffffff;-->
+<!--            &#45;&#45;shadow-soft: 0 20px 60px rgba(15, 23, 42, 0.15);-->
+<!--            &#45;&#45;radius-lg: 22px;-->
+<!--            &#45;&#45;error: #dc2626;-->
+<!--            &#45;&#45;success: #15803d;-->
+<!--        }-->
+
+<!--        * {-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--            box-sizing: border-box;-->
+<!--        }-->
+
+<!--        body {-->
+<!--            font-family: "Poppins", system-ui, sans-serif;-->
+<!--            background: radial-gradient(circle at top left, #c4f0fa 0%, #e8f9ff 30%, #f0fdf8 65%, #e0f7ff 100%);-->
+<!--            min-height: 100vh;-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            padding: 1.5rem;-->
+<!--        }-->
+
+<!--        /* ===== LOGO ===== */-->
+<!--        .logo-wrap {-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            gap: 0.6rem;-->
+<!--            margin-bottom: 1.8rem;-->
+<!--            text-decoration: none;-->
+<!--            color: var(&#45;&#45;text-main);-->
+<!--        }-->
+
+<!--        .logo-mark {-->
+<!--            width: 42px;-->
+<!--            height: 42px;-->
+<!--            border-radius: 50%;-->
+<!--            background: radial-gradient(circle at 30% 0, #f9fafb 0, #a7f3d0 35%, #22c1c3 70%, #0e7490 100%);-->
+<!--            display: flex;-->
+<!--            align-items: center;-->
+<!--            justify-content: center;-->
+<!--            font-size: 1rem;-->
+<!--            font-weight: 700;-->
+<!--            color: #0b1120;-->
+<!--            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.45);-->
+<!--        }-->
+
+<!--        .logo-text-main {-->
+<!--            font-weight: 700;-->
+<!--            font-size: 1.2rem;-->
+<!--            letter-spacing: 0.02em;-->
+<!--        }-->
+
+<!--        .logo-sub {-->
+<!--            display: block;-->
+<!--            font-size: 0.65rem;-->
+<!--            text-transform: uppercase;-->
+<!--            letter-spacing: 0.18em;-->
+<!--            opacity: 0.55;-->
+<!--        }-->
+
+<!--        /* ===== CARD ===== */-->
+<!--        .auth-card {-->
+<!--            background: var(&#45;&#45;card-bg);-->
+<!--            border-radius: var(&#45;&#45;radius-lg);-->
+<!--            box-shadow: var(&#45;&#45;shadow-soft);-->
+<!--            padding: 2.2rem 2.4rem 2.4rem;-->
+<!--            width: 100%;-->
+<!--            max-width: 420px;-->
+<!--            border: 1px solid rgba(209, 213, 219, 0.6);-->
+<!--        }-->
+
+<!--        /* ===== TABS ===== */-->
+<!--        .tab-row {-->
+<!--            display: flex;-->
+<!--            background: #f1f5f9;-->
+<!--            border-radius: 999px;-->
+<!--            padding: 4px;-->
+<!--            margin-bottom: 1.8rem;-->
+<!--        }-->
+
+<!--        .tab-btn {-->
+<!--            flex: 1;-->
+<!--            border: none;-->
+<!--            background: transparent;-->
+<!--            border-radius: 999px;-->
+<!--            padding: 0.5rem 0;-->
+<!--            font-size: 0.88rem;-->
+<!--            font-weight: 600;-->
+<!--            font-family: inherit;-->
+<!--            color: var(&#45;&#45;text-muted);-->
+<!--            cursor: pointer;-->
+<!--            transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;-->
+<!--        }-->
+
+<!--        .tab-btn.active {-->
+<!--            background: #ffffff;-->
+<!--            color: var(&#45;&#45;text-main);-->
+<!--            box-shadow: 0 2px 10px rgba(15, 23, 42, 0.12);-->
+<!--        }-->
+
+<!--        /* ===== PANELS ===== */-->
+<!--        .panel {-->
+<!--            display: none;-->
+<!--        }-->
+
+<!--        .panel.active {-->
+<!--            display: block;-->
+<!--        }-->
+
+<!--        .panel-title {-->
+<!--            font-size: 1.25rem;-->
+<!--            font-weight: 700;-->
+<!--            margin-bottom: 0.25rem;-->
+<!--            color: var(&#45;&#45;text-main);-->
+<!--        }-->
+
+<!--        .panel-sub {-->
+<!--            font-size: 0.85rem;-->
+<!--            color: var(&#45;&#45;text-muted);-->
+<!--            margin-bottom: 1.4rem;-->
+<!--        }-->
+
+<!--        /* ===== FORM ===== */-->
+<!--        .field {-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            gap: 0.28rem;-->
+<!--            margin-bottom: 1rem;-->
+<!--        }-->
+
+<!--        .field label {-->
+<!--            font-size: 0.82rem;-->
+<!--            font-weight: 600;-->
+<!--            color: var(&#45;&#45;text-main);-->
+<!--        }-->
+
+<!--        .field input {-->
+<!--            border: 1.5px solid rgba(209, 213, 219, 0.9);-->
+<!--            border-radius: 12px;-->
+<!--            padding: 0.65rem 0.9rem;-->
+<!--            font-size: 0.9rem;-->
+<!--            font-family: inherit;-->
+<!--            outline: none;-->
+<!--            background: #f9fafb;-->
+<!--            color: var(&#45;&#45;text-main);-->
+<!--            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;-->
+<!--        }-->
+
+<!--        .field input:focus {-->
+<!--            border-color: var(&#45;&#45;primary);-->
+<!--            background: #ffffff;-->
+<!--            box-shadow: 0 0 0 3px rgba(0, 184, 216, 0.15);-->
+<!--        }-->
+
+<!--        /* password wrapper with eye toggle */-->
+<!--        .pw-wrap {-->
+<!--            position: relative;-->
+<!--        }-->
+
+<!--        .pw-wrap input {-->
+<!--            width: 100%;-->
+<!--            padding-right: 2.6rem;-->
+<!--        }-->
+
+<!--        .pw-eye {-->
+<!--            position: absolute;-->
+<!--            right: 0.75rem;-->
+<!--            top: 50%;-->
+<!--            transform: translateY(-50%);-->
+<!--            background: none;-->
+<!--            border: none;-->
+<!--            cursor: pointer;-->
+<!--            color: var(&#45;&#45;text-muted);-->
+<!--            font-size: 1rem;-->
+<!--            line-height: 1;-->
+<!--            padding: 0;-->
+<!--        }-->
+
+<!--        /* ===== SUBMIT BUTTON ===== */-->
+<!--        .btn-submit {-->
+<!--            width: 100%;-->
+<!--            padding: 0.75rem;-->
+<!--            border: none;-->
+<!--            border-radius: 999px;-->
+<!--            background: linear-gradient(135deg, var(&#45;&#45;accent), var(&#45;&#45;primary));-->
+<!--            color: #0b1120;-->
+<!--            font-family: inherit;-->
+<!--            font-size: 0.95rem;-->
+<!--            font-weight: 700;-->
+<!--            letter-spacing: 0.04em;-->
+<!--            cursor: pointer;-->
+<!--            margin-top: 0.4rem;-->
+<!--            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.4);-->
+<!--            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;-->
+<!--        }-->
+
+<!--        .btn-submit:hover {-->
+<!--            transform: translateY(-2px);-->
+<!--            box-shadow: 0 16px 40px rgba(6, 182, 212, 0.55);-->
+<!--            filter: brightness(1.04);-->
+<!--        }-->
+
+<!--        .btn-submit:active {-->
+<!--            transform: translateY(0);-->
+<!--            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.4);-->
+<!--        }-->
+
+<!--        .btn-submit:disabled {-->
+<!--            opacity: 0.65;-->
+<!--            cursor: not-allowed;-->
+<!--            transform: none;-->
+<!--        }-->
+
+<!--        /* ===== MESSAGES ===== */-->
+<!--        .msg {-->
+<!--            font-size: 0.83rem;-->
+<!--            margin-top: 0.85rem;-->
+<!--            text-align: center;-->
+<!--            min-height: 1.2em;-->
+<!--            font-weight: 500;-->
+<!--        }-->
+
+<!--        .msg.error {-->
+<!--            color: var(&#45;&#45;error);-->
+<!--        }-->
+
+<!--        .msg.success {-->
+<!--            color: var(&#45;&#45;success);-->
+<!--        }-->
+
+<!--        /* ===== FOOTER LINK ===== */-->
+<!--        .switch-link {-->
+<!--            text-align: center;-->
+<!--            font-size: 0.82rem;-->
+<!--            color: var(&#45;&#45;text-muted);-->
+<!--            margin-top: 1.3rem;-->
+<!--        }-->
+
+<!--        .switch-link button {-->
+<!--            background: none;-->
+<!--            border: none;-->
+<!--            color: var(&#45;&#45;primary-dark);-->
+<!--            font-weight: 600;-->
+<!--            font-family: inherit;-->
+<!--            font-size: inherit;-->
+<!--            cursor: pointer;-->
+<!--            text-decoration: underline;-->
+<!--            text-underline-offset: 2px;-->
+<!--        }-->
+
+<!--        @keyframes fadeInUp {-->
+<!--            from {-->
+<!--                opacity: 0;-->
+<!--                transform: translateY(14px);-->
+<!--            }-->
+
+<!--            to {-->
+<!--                opacity: 1;-->
+<!--                transform: translateY(0);-->
+<!--            }-->
+<!--        }-->
+
+<!--        .auth-card {-->
+<!--            animation: fadeInUp 0.45s ease both;-->
+<!--        }-->
+<!--    </style>-->
+<!--</head>-->
+
+<!--<body>-->
+
+<!--    <a href="/index.html" class="logo-wrap">-->
+<!--        <div class="logo-mark">ST</div>-->
+<!--        <div>-->
+<!--            <div class="logo-text-main">Safe Trip Planner</div>-->
+<!--            <span class="logo-sub">Plan smart · travel safe</span>-->
+<!--        </div>-->
+<!--    </a>-->
+
+<!--    <div class="auth-card">-->
+
+<!--        &lt;!&ndash; Tab switcher &ndash;&gt;-->
+<!--        <div class="tab-row">-->
+<!--            <button class="tab-btn active" id="tab-login" onclick="switchTab('login')">Login</button>-->
+<!--            <button class="tab-btn" id="tab-register" onclick="switchTab('register')">Register</button>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; LOGIN PANEL &ndash;&gt;-->
+<!--        <div class="panel active" id="panel-login">-->
+<!--            <div class="panel-title">Welcome back 👋</div>-->
+<!--            <div class="panel-sub">Sign in to continue planning your trips.</div>-->
+
+<!--            <form id="form-login" novalidate onsubmit="handleLogin(event)">-->
+<!--                <div class="field">-->
+<!--                    <label for="login-email">Email address</label>-->
+<!--                    <input id="login-email" type="email" placeholder="you@example.com" autocomplete="email" required>-->
+<!--                </div>-->
+<!--                <div class="field">-->
+<!--                    <label for="login-password">Password</label>-->
+<!--                    <div class="pw-wrap">-->
+<!--                        <input id="login-password" type="password" placeholder="••••••••"-->
+<!--                            autocomplete="current-password" required>-->
+<!--                        <button type="button" class="pw-eye" onclick="togglePw('login-password', this)"-->
+<!--                            title="Show/hide password">👁</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <button type="submit" class="btn-submit" id="btn-login">Sign In</button>-->
+<!--                <div style="text-align:center; margin:10px 0; color:#6b7280;">-->
+<!--                    OR-->
+<!--                </div>-->
+<!--                <a href="/oauth2/authorization/github" class="btn-submit github-btn">-->
+<!--                    Continue with GitHub-->
+<!--                </a>-->
+<!--                <div class="msg" id="msg-login"></div>-->
+<!--            </form>-->
+
+<!--            <div class="switch-link">-->
+<!--                Don't have an account?-->
+<!--                <button onclick="switchTab('register')">Create one</button>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--        &lt;!&ndash; REGISTER PANEL &ndash;&gt;-->
+<!--        <div class="panel" id="panel-register">-->
+<!--            <div class="panel-title">Create account ✨</div>-->
+<!--            <div class="panel-sub">Join Safe Trip Planner and start exploring.</div>-->
+
+<!--            <form id="form-register" novalidate onsubmit="handleRegister(event)">-->
+<!--                <div class="field">-->
+<!--                    <label for="reg-email">Email address</label>-->
+<!--                    <input id="reg-email" type="email" placeholder="you@example.com" autocomplete="email" required>-->
+<!--                </div>-->
+<!--                <div class="field">-->
+<!--                    <label for="reg-password">Password <span style="color:var(&#45;&#45;text-muted);font-weight:400">(min 6-->
+<!--                            chars)</span></label>-->
+<!--                    <div class="pw-wrap">-->
+<!--                        <input id="reg-password" type="password" placeholder="••••••••" autocomplete="new-password"-->
+<!--                            required>-->
+<!--                        <button type="button" class="pw-eye" onclick="togglePw('reg-password', this)"-->
+<!--                            title="Show/hide password">👁</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="field">-->
+<!--                    <label for="reg-confirm">Confirm password</label>-->
+<!--                    <div class="pw-wrap">-->
+<!--                        <input id="reg-confirm" type="password" placeholder="••••••••" autocomplete="new-password"-->
+<!--                            required>-->
+<!--                        <button type="button" class="pw-eye" onclick="togglePw('reg-confirm', this)"-->
+<!--                            title="Show/hide password">👁</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <button type="submit" class="btn-submit" id="btn-register">Create Account</button>-->
+<!--                <div class="msg" id="msg-register"></div>-->
+<!--            </form>-->
+
+<!--            <div class="switch-link">-->
+<!--                Already have an account?-->
+<!--                <button onclick="switchTab('login')">Sign in</button>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--    </div>-->
+
+<!--    <script>-->
+<!--        // ===== If already logged in, skip to plan-trip =====-->
+<!--        (function () {-->
+<!--            if (localStorage.getItem("authToken")) {-->
+<!--                window.location.replace("/plan-trip.html");-->
+<!--            }-->
+<!--        })();-->
+
+<!--        // ===== Tab switching =====-->
+<!--        function switchTab(tab) {-->
+<!--            document.getElementById("panel-login").classList.toggle("active", tab === "login");-->
+<!--            document.getElementById("panel-register").classList.toggle("active", tab === "register");-->
+<!--            document.getElementById("tab-login").classList.toggle("active", tab === "login");-->
+<!--            document.getElementById("tab-register").classList.toggle("active", tab === "register");-->
+<!--            document.getElementById("msg-login").textContent = "";-->
+<!--            document.getElementById("msg-register").textContent = "";-->
+<!--        }-->
+
+<!--        // ===== Password eye toggle =====-->
+<!--        function togglePw(inputId, btn) {-->
+<!--            const input = document.getElementById(inputId);-->
+<!--            if (input.type === "password") {-->
+<!--                input.type = "text";-->
+<!--                btn.textContent = "🙈";-->
+<!--            } else {-->
+<!--                input.type = "password";-->
+<!--                btn.textContent = "👁";-->
+<!--            }-->
+<!--        }-->
+
+<!--        // ===== Show message helpers =====-->
+<!--        function showMsg(id, text, type) {-->
+<!--            const el = document.getElementById(id);-->
+<!--            el.textContent = text;-->
+<!--            el.className = "msg " + type;-->
+<!--        }-->
+
+<!--        // ===== Save session & redirect =====-->
+<!--        function saveSession(data) {-->
+<!--            localStorage.setItem("authToken", data.token);-->
+<!--            localStorage.setItem("userEmail", data.email);-->
+<!--            window.location.replace("/plan-trip.html");-->
+<!--        }-->
+
+<!--        // ===== LOGIN =====-->
+<!--        async function handleLogin(e) {-->
+<!--            e.preventDefault();-->
+<!--            const email = document.getElementById("login-email").value.trim();-->
+<!--            const password = document.getElementById("login-password").value;-->
+<!--            const btn = document.getElementById("btn-login");-->
+
+<!--            if (!email || !password) {-->
+<!--                showMsg("msg-login", "Please fill in all fields.", "error");-->
+<!--                return;-->
+<!--            }-->
+
+<!--            btn.disabled = true;-->
+<!--            btn.textContent = "Signing in…";-->
+
+<!--            try {-->
+<!--                const res = await fetch("/api/auth/login", {-->
+<!--                    method: "POST",-->
+<!--                    headers: { "Content-Type": "application/json" },-->
+<!--                    body: JSON.stringify({ email, password })-->
+<!--                });-->
+<!--                const data = await res.json();-->
+<!--                if (!res.ok) {-->
+<!--                    showMsg("msg-login", data.error || "Login failed.", "error");-->
+<!--                } else {-->
+<!--                    showMsg("msg-login", "✓ Logged in! Redirecting…", "success");-->
+<!--                    setTimeout(() => saveSession(data), 600);-->
+<!--                }-->
+<!--            } catch {-->
+<!--                showMsg("msg-login", "Network error. Is the server running?", "error");-->
+<!--            } finally {-->
+<!--                btn.disabled = false;-->
+<!--                btn.textContent = "Sign In";-->
+<!--            }-->
+<!--        }-->
+
+<!--        // ===== REGISTER =====-->
+<!--        async function handleRegister(e) {-->
+<!--            e.preventDefault();-->
+<!--            const email = document.getElementById("reg-email").value.trim();-->
+<!--            const password = document.getElementById("reg-password").value;-->
+<!--            const confirm = document.getElementById("reg-confirm").value;-->
+<!--            const btn = document.getElementById("btn-register");-->
+
+<!--            if (!email || !password || !confirm) {-->
+<!--                showMsg("msg-register", "Please fill in all fields.", "error");-->
+<!--                return;-->
+<!--            }-->
+<!--            if (password.length < 6) {-->
+<!--                showMsg("msg-register", "Password must be at least 6 characters.", "error");-->
+<!--                return;-->
+<!--            }-->
+<!--            if (password !== confirm) {-->
+<!--                showMsg("msg-register", "Passwords do not match.", "error");-->
+<!--                return;-->
+<!--            }-->
+
+<!--            btn.disabled = true;-->
+<!--            btn.textContent = "Creating account…";-->
+
+<!--            try {-->
+<!--                const res = await fetch("/api/auth/register", {-->
+<!--                    method: "POST",-->
+<!--                    headers: { "Content-Type": "application/json" },-->
+<!--                    body: JSON.stringify({ email, password })-->
+<!--                });-->
+<!--                const data = await res.json();-->
+<!--                if (!res.ok) {-->
+<!--                    showMsg("msg-register", data.error || "Registration failed.", "error");-->
+<!--                } else {-->
+<!--                    showMsg("msg-register", "✓ Account created! Redirecting…", "success");-->
+<!--                    setTimeout(() => saveSession(data), 600);-->
+<!--                }-->
+<!--            } catch {-->
+<!--                showMsg("msg-register", "Network error. Is the server running?", "error");-->
+<!--            } finally {-->
+<!--                btn.disabled = false;-->
+<!--                btn.textContent = "Create Account";-->
+<!--            }-->
+<!--        }-->
+<!--    </script>-->
+
+<!--</body>-->
+
+<!--</html>-->

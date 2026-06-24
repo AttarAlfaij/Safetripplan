@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Plan Trip | Safe Trip Planner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <!-- Shared Navbar -->
+    <link rel="stylesheet" href="/navbar.css">
+
+    <style>
+        /* ===== PAGE STYLES ===== */
+
+        :root {
+            --primary: #00b8d8;
+            --primary-dark: #0086a0;
+            --accent: #00c9a7;
+            --bg: #f3f7fb;
+            --text-main: #0f172a;
+            --text-muted: #6b7280;
+            --card-bg: #ffffff;
+            --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.12);
+            --radius-lg: 18px;
+            --transition-med: 0.35s ease;
+        }
+
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        main {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-shell {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 1.75rem 1.5rem 2.5rem;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.75rem;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+        }
+
+        .brand-mark {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 0, #f9fafb 0, #a7f3d0 35%, #22c1c3 70%, #0e7490 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #0b1120;
+            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.55);
+        }
+
+        .brand-text-main {
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            font-size: 1.05rem;
+        }
+
+        .brand-sub {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .page-header a.back-link {
+            font-size: 0.88rem;
+            color: var(--primary-dark);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .page-header a.back-link span {
+            transition: transform 0.25s ease;
+        }
+
+        .page-header a.back-link:hover span {
+            transform: translateX(-3px);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.3fr) minmax(0, 1.5fr);
+            gap: 1.75rem;
+            align-items: flex-start;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            padding: 1.4rem 1.6rem 1.6rem;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+        }
+
+        .card-title {
+            font-size: 1.15rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1.3rem;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .field label {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .field span.hint {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
+        .field input,
+        .field select {
+            border-radius: 999px;
+            border: 1px solid rgba(209, 213, 219, 0.9);
+            padding: 0.6rem 0.9rem;
+            font-size: 0.9rem;
+            outline: none;
+            background: #f9fafb;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: rgba(56, 189, 248, 0.9);
+            background: #ffffff;
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
+        }
+
+        .actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.9rem;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+            padding: 0.65rem 1.4rem;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: #0b1120;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            box-shadow: 0 12px 30px rgba(6, 182, 212, 0.45);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 18px 40px rgba(6, 182, 212, 0.65);
+            filter: brightness(1.02);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0) scale(0.99);
+            box-shadow: 0 10px 24px rgba(6, 182, 212, 0.55);
+        }
+
+        .spinner {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease;
+        }
+
+        .spinner-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 999px;
+            border: 2px solid rgba(148, 163, 184, 0.7);
+            border-top-color: var(--primary);
+            animation: spin 0.7s linear infinite;
+        }
+
+        .spinner.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .status-message {
+            font-size: 0.85rem;
+            margin-top: 0.6rem;
+            color: var(--text-muted);
+            min-height: 1.2em;
+        }
+
+        .status-message.error {
+            color: #b91c1c;
+        }
+
+        .status-message.success {
+            color: #15803d;
+        }
+
+        .results-wrapper {
+            display: none;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .results-wrapper.visible {
+            display: block;
+        }
+
+        .results-wrapper.fade-in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .results-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .results-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+        }
+
+        .results-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .day-list {
+            display: grid;
+            gap: 0.9rem;
+        }
+
+        .day {
+            border-radius: 12px;
+            padding: 0.9rem 0.9rem 0.8rem;
+            background: linear-gradient(135deg, rgba(239, 246, 255, 0.9), rgba(224, 242, 254, 0.9));
+            border: 1px solid rgba(191, 219, 254, 0.9);
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        .day:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .day:nth-child(2) {
+            animation-delay: 0.12s;
+        }
+
+        .day:nth-child(3) {
+            animation-delay: 0.19s;
+        }
+
+        .day-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.45rem;
+        }
+
+        .places-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.7rem;
+        }
+
+        .place-card {
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 0.7rem 0.75rem 0.8rem;
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            font-size: 0.84rem;
+            transition: transform var(--transition-med), box-shadow var(--transition-med), border-color var(--transition-med);
+            position: relative;
+        }
+
+        .place-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.16);
+            border-color: rgba(56, 189, 248, 0.7);
+        }
+
+        .place-name {
+            font-weight: 600;
+            margin-bottom: 0.15rem;
+            padding-right: 1.8rem;
+        }
+
+        .place-category {
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .place-link a {
+            font-size: 0.8rem;
+            color: var(--primary-dark);
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+        }
+
+        .btn-add-trip {
+            position: absolute;
+            top: 0.6rem;
+            right: 0.6rem;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1.5px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            font-size: 1.1rem;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+            font-weight: 600;
+        }
+
+        .btn-add-trip:hover {
+            background: var(--primary);
+            color: #fff;
+            transform: scale(1.15);
+        }
+
+        .btn-add-trip.added {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            cursor: default;
+        }
+
+        /* Toast notification */
+        #trip-toast {
+            position: fixed;
+            bottom: 1.8rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: #0f172a;
+            color: #e5faff;
+            padding: 0.65rem 1.4rem;
+            border-radius: 999px;
+            font-size: 0.87rem;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            z-index: 9999;
+            white-space: nowrap;
+        }
+
+        #trip-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .map-wrapper {
+            margin-top: 1.1rem;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(209, 213, 219, 0.9);
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.45s ease, transform 0.45s ease;
+        }
+
+        .map-wrapper.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        #map {
+            width: 100%;
+            height: 360px;
+        }
+
+        @media (max-width: 640px) {
+            .page-shell {
+                padding-inline: 1.2rem;
+            }
+
+            .card {
+                padding-inline: 1.1rem;
+            }
+
+            #map {
+                height: 280px;
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+<!-- Shared Navbar -->
+<script src="/navbar.js"></script>
+<script src="/js/i18n.js"></script>
+
+<main>
+    <div class="page-shell">
+        <header class="page-header">
+            <div class="brand">
+                <div class="brand-mark">ST</div>
+                <div>
+                    <div class="brand-text-main">Safe Trip Planner</div>
+                    <span class="brand-sub" data-i18n="brand_sub">Plan trip · day-by-day</span>
+                </div>
+            </div>
+            <a href="/index.html" class="back-link">
+                <span>←</span>
+                <span data-i18n="back_to_home">Back to Home</span>
+            </a>
+        </header>
+
+        <div class="layout">
+            <section class="card" aria-labelledby="plan-form-title">
+                <h1 id="plan-form-title" class="card-title" data-i18n="plan_form_title">Plan a new trip</h1>
+                <p class="card-subtitle" data-i18n="plan_form_subtitle">
+                    Choose your city, travel mood, and trip length. Safe Trip Planner will generate a simple,
+                    structured itinerary.
+                </p>
+
+                <form id="plan-form" class="form-grid" novalidate>
+                    <div class="field">
+                        <label for="city" data-i18n="city_label">City / Region / Place</label>
+                        <input id="city" name="city" type="text" placeholder="e.g. Kashmir, Leh, Paris, Bali"
+                               required>
+                        <span class="hint" data-i18n="city_hint">Works with Cities, Districts, regions, tourist areas.</span>
+                    </div>
+
+                    <div class="field">
+                        <label for="mood" data-i18n="mood_label">Travel Mood</label>
+                        <select id="mood" name="mood" required>
+                            <option value="" data-i18n="mood_select">Select mood</option>
+                            <option value="Tourist">🗺 Tourist</option>
+                            <option value="Adventure">🏔 Adventure</option>
+                            <option value="Historical">🏛 Historical</option>
+                            <option value="Romantic">💕 Romantic</option>
+                            <option value="Nature">🌿 Nature</option>
+                            <option value="Relaxation">☀ Relaxation</option>
+                            <option value="Spiritual">🕌 Spiritual</option>
+                            <option value="Family Friendly">👨‍👩‍👧 Family Friendly</option>
+                        </select>
+                    </div>
+
+                    <div class="field">
+                        <label for="days" data-i18n="days_label">Number of days</label>
+                        <input id="days" name="days" type="number" min="1" value="3" required>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn-primary" data-i18n="generate_plan">
+                            <span></span>
+                        </button>
+                        <div id="spinner" class="spinner" aria-hidden="true">
+                            <div class="spinner-dot"></div>
+                            <span data-i18n="searching_places">Searching places nearby…</span>
+                        </div>
+                    </div>
+                    <div id="status" class="status-message"></div>
+                </form>
+            </section>
+
+            <section class="card" aria-live="polite">
+                <div id="results-wrapper" class="results-wrapper">
+                    <div class="results-header">
+                        <div id="results-title" class="results-title"></div>
+                        <div id="results-meta" class="results-meta"></div>
+                    </div>
+                    <div id="day-list" class="day-list"></div>
+                    <div id="map-wrapper" class="map-wrapper">
+                        <div id="map"></div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+<script>
+    (function () {
+        'use strict';
+
+        const STORAGE_KEY_FORM = 'planTripForm';
+        const STORAGE_KEY_DATA = 'planTripData';
+
+        const form = document.getElementById('plan-form');
+        const cityInput = document.getElementById('city');
+        const moodSelect = document.getElementById('mood');
+        const daysInput = document.getElementById('days');
+        const spinner = document.getElementById('spinner');
+        const statusEl = document.getElementById('status');
+        const resultsWrapper = document.getElementById('results-wrapper');
+        const resultsTitle = document.getElementById('results-title');
+        const resultsMeta = document.getElementById('results-meta');
+        const dayList = document.getElementById('day-list');
+        const mapWrapper = document.getElementById('map-wrapper');
+
+        let map = null;
+        let markersLayer = null;
+
+        function saveFormState() {
+            const data = {
+                city: cityInput.value,
+                mood: moodSelect.value,
+                days: daysInput.value
+            };
+            localStorage.setItem(STORAGE_KEY_FORM, JSON.stringify(data));
+        }
+
+        function restoreState() {
+            // Restore form inputs
+            const savedForm = localStorage.getItem(STORAGE_KEY_FORM);
+            if (savedForm) {
+                try {
+                    const f = JSON.parse(savedForm);
+                    if (f.city) cityInput.value = f.city;
+                    if (f.mood) moodSelect.value = f.mood;
+                    if (f.days) daysInput.value = f.days;
+                } catch (e) { /* ignore */ }
+            }
+
+            // Restore last itinerary result
+            const savedData = localStorage.getItem(STORAGE_KEY_DATA);
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    renderResults(data);
+                    showSuccess("Trip plan generated successfully.");
+                } catch (e) { /* ignore */ }
+            }
+        }
+
+        // Save form on every input change
+        cityInput.addEventListener("input", saveFormState);
+        moodSelect.addEventListener("change", saveFormState);
+        daysInput.addEventListener("input", saveFormState);
+
+        // Restore on load
+        restoreState();
+
+        function setLoading(isLoading) {
+            if (isLoading) {
+                spinner.classList.add("visible");
+                statusEl.textContent = "";
+                statusEl.className = "status-message";
+            } else {
+                spinner.classList.remove("visible");
+            }
+        }
+
+        function showError(message) {
+            statusEl.textContent = message || "Something went wrong while generating your plan.";
+            statusEl.className = "status-message error";
+        }
+
+        function showSuccess(message) {
+            statusEl.textContent = message || "";
+            statusEl.className = "status-message success";
+        }
+
+        function clearResults() {
+            dayList.innerHTML = "";
+            resultsTitle.textContent = "";
+            resultsMeta.textContent = "";
+            resultsWrapper.classList.remove("visible", "fade-in");
+            mapWrapper.classList.remove("visible");
+            if (markersLayer && map) {
+                markersLayer.clearLayers();
+            }
+        }
+
+        function ensureMap() {
+            if (!map) {
+                map = L.map("map");
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    maxZoom: 19,
+                    attribution: "&copy; OpenStreetMap contributors"
+                }).addTo(map);
+
+                markersLayer = L.layerGroup().addTo(map);
+            }
+        }
+
+        function renderResults(data) {
+            // Always source "already added" state from the server (session-scoped),
+            // never from localStorage — that's how data leaked across users/sessions.
+            fetch("/api/my-places", { cache: "no-store" })
+                .then(function (res) { return res.ok ? res.json() : []; })
+                .catch(function () { return []; })
+                .then(function (myPlaces) {
+                    renderResultsWithPlaces(data, myPlaces || []);
+                });
+        }
+
+        function renderResultsWithPlaces(data, myPlaces) {
+            console.log("renderResults called with data:", data);
+
+            clearResults();
+
+            if (!data || !data.itinerary) {
+                console.error("No data or itinerary found:", data);
+                showError("No itinerary data returned.");
+                return;
+            }
+
+            const city = data.city || cityInput.value || "";
+            const days = data.days || 0;
+
+            resultsTitle.textContent = city ? "Your plan for " + city : "Your trip plan";
+            resultsMeta.textContent = days ? days + " day" + (days > 1 ? "s" : "") + " · generated by Safe Trip Planner" : "";
+
+            const allPlaces = [];
+            const keys = Object.keys(data.itinerary).sort(function (a, b) {
+                const aNum = parseInt(a.replace(/\D/g, ""), 10) || 0;
+                const bNum = parseInt(b.replace(/\D/g, ""), 10) || 0;
+                return aNum - bNum;
+            });
+
+            console.log("Itinerary keys:", keys);
+
+            keys.forEach(function (dayKey, index) {
+                const places = data.itinerary[dayKey] || [];
+                console.log("Day", dayKey, "places:", places);
+
+                const dayEl = document.createElement("div");
+                dayEl.className = "day";
+
+                const titleEl = document.createElement("div");
+                titleEl.className = "day-title";
+                titleEl.textContent = dayKey;
+                dayEl.appendChild(titleEl);
+
+                const gridEl = document.createElement("div");
+                gridEl.className = "places-grid";
+
+                if (places.length === 0) {
+                    const empty = document.createElement("div");
+                    empty.textContent = "No places assigned to this day.";
+                    empty.style.fontSize = "0.82rem";
+                    empty.style.color = "#6b7280";
+                    gridEl.appendChild(empty);
+                } else {
+                    places.forEach(function (place) {
+                        if (place) {
+                            allPlaces.push(place);
+                        }
+
+                        const card = document.createElement("article");
+                        card.className = "place-card";
+
+                        const name = document.createElement("div");
+                        name.className = "place-name";
+                        name.textContent = place.name || "Unnamed place";
+                        card.appendChild(name);
+
+                        const category = document.createElement("div");
+                        category.className = "place-category";
+                        category.textContent = place.category || "";
+                        card.appendChild(category);
+
+                        if (place.osmLink) {
+                            const linkWrapper = document.createElement("div");
+                            linkWrapper.className = "place-link";
+                            const link = document.createElement("a");
+                            link.href = place.osmLink;
+                            link.target = "_blank";
+                            link.rel = "noopener noreferrer";
+                            link.textContent = "View on OpenStreetMap";
+                            linkWrapper.appendChild(link);
+                            card.appendChild(linkWrapper);
+                        }
+
+                        // (+) Add to My Trip / (✕) Remove button
+                        const addBtn = document.createElement("button");
+                        addBtn.className = "btn-add-trip";
+                        addBtn.title = "Add to My Trip";
+
+                        // Check if already saved (server-sourced list, by name)
+                        const existing = myPlaces.find(function (p) { return p.name === (place.name || ""); });
+
+                        if (existing) {
+                            addBtn.textContent = "✕";
+                            addBtn.classList.add("added");
+                            addBtn.title = "Remove from My Trip";
+                        } else {
+                            addBtn.textContent = "+";
+                        }
+
+                        addBtn.addEventListener("click", function () {
+                            if (addBtn.classList.contains("added")) {
+                                // ── REMOVE ──────────────────────────────────────────
+                                const entry = myPlaces.find(function (p) { return p.name === (place.name || ""); });
+                                const dbId = entry && entry.id ? entry.id : null;
+
+                                if (!dbId) {
+                                    // Shouldn't happen now every entry comes from the
+                                    // server with a real id, but guard anyway.
+                                    console.warn("No DB id found for place:", place.name);
+                                    addBtn.textContent = "+";
+                                    addBtn.classList.remove("added");
+                                    addBtn.title = "Add to My Trip";
+                                    return;
+                                }
+
+                                // Disable button while request is in-flight
+                                addBtn.disabled = true;
+                                addBtn.style.opacity = "0.5";
+
+                                fetch("/api/my-places/" + dbId, { method: "DELETE" })
+                                    .then(function (res) {
+                                        if (!res.ok) {
+                                            throw new Error("DELETE failed with status " + res.status);
+                                        }
+                                        // Success: update in-memory list and UI
+                                        const idx = myPlaces.findIndex(function (p) { return p.name === (place.name || ""); });
+                                        if (idx !== -1) {
+                                            myPlaces.splice(idx, 1);
+                                        }
+                                        addBtn.textContent = "+";
+                                        addBtn.classList.remove("added");
+                                        addBtn.title = "Add to My Trip";
+                                        console.log("[Remove] Deleted from DB and UI:", place.name, "id=" + dbId);
+                                    })
+                                    .catch(function (err) {
+                                        console.error("[Remove] API error — UI not changed:", err);
+                                    })
+                                    .finally(function () {
+                                        addBtn.disabled = false;
+                                        addBtn.style.opacity = "";
+                                    });
+
+                            } else {
+                                // ── ADD ─────────────────────────────────────────────
+                                addBtn.disabled = true;
+                                addBtn.style.opacity = "0.5";
+
+                                fetch("/api/my-places", {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({
+                                        name: place.name || "Unnamed place",
+                                        category: place.category || "",
+                                        lat: place.lat || 0,
+                                        lon: place.lon || 0,
+                                        osmLink: place.osmLink || ""
+                                    })
+                                })
+                                    .then(function (res) {
+                                        if (!res.ok) {
+                                            throw new Error("POST failed with status " + res.status);
+                                        }
+                                        return res.json();
+                                    })
+                                    .then(function (savedPlace) {
+                                        // savedPlace.id is the real DB primary key
+                                        // Avoid duplicates (race condition guard)
+                                        if (!myPlaces.some(function (p) { return p.name === (place.name || ""); })) {
+                                            myPlaces.push({
+                                                id: savedPlace.id,          // DB id for DELETE
+                                                name: savedPlace.name || place.name || "Unnamed place",
+                                                category: savedPlace.category || place.category || "",
+                                                osmLink: savedPlace.osmLink || place.osmLink || ""
+                                            });
+                                        }
+                                        addBtn.textContent = "✕";
+                                        addBtn.classList.add("added");
+                                        addBtn.title = "Remove from My Trip";
+                                        showTripToast(place.name || "Place");
+                                        console.log("[Add] Saved to DB and UI:", place.name, "id=" + savedPlace.id);
+                                    })
+                                    .catch(function (err) {
+                                        console.error("[Add] API error — UI not changed:", err);
+                                    })
+                                    .finally(function () {
+                                        addBtn.disabled = false;
+                                        addBtn.style.opacity = "";
+                                    });
+                            }
+                        });
+
+                        card.appendChild(addBtn);
+                        gridEl.appendChild(card);
+                    });
+                }
+
+                dayEl.appendChild(gridEl);
+                dayEl.style.animationDelay = (0.05 + index * 0.07) + "s";
+                dayList.appendChild(dayEl);
+            });
+
+            console.log("Adding visible class to resultsWrapper");
+            resultsWrapper.classList.add("visible");
+            requestAnimationFrame(function () {
+                resultsWrapper.classList.add("fade-in");
+            });
+
+            if (allPlaces.length > 0) {
+                ensureMap();
+                markersLayer.clearLayers();
+
+                const latLngs = [];
+                allPlaces.forEach(function (place) {
+                    if (place.lat != null && place.lon != null) {
+                        const lat = parseFloat(place.lat);
+                        const lon = parseFloat(place.lon);
+                        if (isNaN(lat) || isNaN(lon)) {
+                            return;
+                        }
+                        const marker = L.marker([lat, lon]).addTo(markersLayer);
+                        marker.bindPopup(place.name || "Place");
+                        latLngs.push([lat, lon]);
+                    }
+                });
+
+                if (latLngs.length > 0) {
+                    map.fitBounds(latLngs, { padding: [30, 30] });
+                }
+
+                mapWrapper.classList.add("visible");
+            } else {
+                mapWrapper.classList.remove("visible");
+            }
+
+            showSuccess("Trip plan generated successfully.");
+        }
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const city = cityInput.value.trim();
+            const mood = moodSelect.value;
+            const daysValue = daysInput.value;
+            const days = parseInt(daysValue, 10);
+
+            if (!city || !mood || !days || days < 1) {
+                showError("Please fill all required fields with valid values.");
+                return;
+            }
+
+            setLoading(true);
+            clearResults();
+
+            fetch("/api/plan-trip", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    city: city,
+                    mood: mood,
+                    days: days
+                })
+            })
+                .then(function (response) {
+                    console.log("API Response status:", response.status);
+                    if (!response.ok) {
+                        return response.json().catch(function () {
+                            return {};
+                        }).then(function (errorBody) {
+                            const message = errorBody && errorBody.message ? errorBody.message : "Could not generate a trip plan.";
+                            throw new Error(message);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    console.log("API Response data:", data);
+                    localStorage.setItem(STORAGE_KEY_DATA, JSON.stringify(data));
+                    renderResults(data);
+                })
+                .catch(function (error) {
+                    console.error("API Error:", error);
+                    showError(error && error.message ? error.message : "Could not generate a trip plan.");
+                })
+                .finally(function () {
+                    setLoading(false);
+                });
+        });
+        // Toast helper
+        function showTripToast(placeName) {
+            let toast = document.getElementById("trip-toast");
+            if (!toast) {
+                toast = document.createElement("div");
+                toast.id = "trip-toast";
+                document.body.appendChild(toast);
+            }
+            toast.textContent = "\u2713 " + placeName + " added to My Trip!";
+            toast.classList.add("show");
+            clearTimeout(toast._hideTimer);
+            toast._hideTimer = setTimeout(function () {
+                toast.classList.remove("show");
+            }, 2500);
+        }
+
+    })();
+</script>
+
+<script>
+    // ===== AUTH NAVBAR =====
+    (function () {
+        const email = localStorage.getItem("userEmail");
+        const token = localStorage.getItem("authToken");
+        const container = document.getElementById("nav-auth");
+        if (!container) return;
+
+        if (token && email) {
+            const initial = email.charAt(0).toUpperCase();
+            container.innerHTML = `
+            <div class="user-chip">
+                <div class="user-avatar">${initial}</div>
+                <span>${email}</span>
+            </div>
+            <button class="btn-logout" onclick="doLogout()">Logout</button>
+        `;
+        } else {
+            container.innerHTML = `<a href="/login.html" class="nav-login-link">Login</a>`;
+        }
+    })();
+
+    function doLogout() {
+        const token = localStorage.getItem("authToken");
+        if (token) {
+            fetch("/api/auth/logout", {
+                method: "POST",
+                headers: { "Authorization": "Bearer " + token }
+            }).catch(() => { });
+        }
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("userEmail");
+        window.location.replace("/login.html");
+    }
+</script>
+</body>
+
+</html>

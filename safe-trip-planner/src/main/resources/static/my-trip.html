@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>My Trip | Safe Trip Planner</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+    <!-- ✅ Shared Navbar -->
+    <link rel="stylesheet" href="/navbar.css">
+
+
+    <style>
+        :root {
+            --primary: #00b8d8;
+            --primary-dark: #0086a0;
+            --accent: #00c9a7;
+            --bg: #f3f7fb;
+            --text-main: #0f172a;
+            --text-muted: #6b7280;
+            --card-bg: #ffffff;
+            --shadow-soft: 0 16px 40px rgba(15, 23, 42, 0.12);
+            --radius-lg: 18px;
+            --transition-med: 0.35s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top left, #e0f7ff 0, #f5fbff 35%, #f4fbf9 65%, #e6f9ff 100%);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding-top: 80px;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* ===== NAVBAR ===== */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(18px);
+            background: linear-gradient(90deg, rgba(10, 25, 47, 0.90), rgba(6, 95, 122, 0.88));
+            box-shadow: 0 16px 35px rgba(15, 23, 42, 0.35);
+        }
+
+        .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.9rem 1.5rem;
+            max-width: 1120px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            color: #e5faff;
+        }
+
+        .logo-mark {
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            background: radial-gradient(circle at 30% 0, #f9fafb 0, #a7f3d0 35%, #22c1c3 70%, #0e7490 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #0b1120;
+        }
+
+        .logo-text-main {
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            font-size: 1.05rem;
+        }
+
+        .logo-subtitle {
+            display: block;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            opacity: 0.7;
+            margin-top: -0.12rem;
+        }
+
+        .nav {
+            display: flex;
+            align-items: center;
+            gap: 1.8rem;
+        }
+
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: 1.8rem;
+        }
+
+        .navbar-links a {
+            position: relative;
+            font-size: 0.9rem;
+            letter-spacing: 0.07em;
+            text-transform: uppercase;
+            color: #dbeafe;
+            text-decoration: none;
+            padding-bottom: 0.25rem;
+            transition: color 0.25s ease;
+        }
+
+        .navbar-links a::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent), var(--primary));
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 0.4s ease;
+        }
+
+        .navbar-links a:hover {
+            color: #ffffff;
+        }
+
+        .navbar-links a:hover::after,
+        .navbar-links a.active::after {
+            transform: scaleX(1);
+        }
+
+        /* Auth elements */
+        .user-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            padding: 0.28rem 0.75rem 0.28rem 0.4rem;
+            font-size: 0.8rem;
+            color: #e5faff;
+            font-weight: 500;
+        }
+
+        .user-chip .user-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: #0b1120;
+        }
+
+        .btn-logout {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 999px;
+            color: #e5faff;
+            font-size: 0.78rem;
+            font-family: inherit;
+            font-weight: 600;
+            padding: 0.22rem 0.7rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .nav-login-link {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #e5faff !important;
+            background: rgba(0, 184, 216, 0.25);
+            border-radius: 999px;
+            padding: 0.25rem 0.85rem;
+            text-decoration: none;
+            transition: background 0.2s ease;
+        }
+
+        .nav-login-link:hover {
+            background: rgba(0, 184, 216, 0.45);
+        }
+
+        @media (max-width: 768px) {
+            .header-inner {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+                padding: 0.85rem 1.25rem;
+            }
+
+            .navbar-links {
+                width: 100%;
+                flex-wrap: wrap;
+                gap: 1rem 1.4rem;
+            }
+        }
+
+        /* ===== PAGE SHELL ===== */
+        .page-shell {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 3rem;
+        }
+
+        .page-heading {
+            margin-bottom: 1.8rem;
+        }
+
+        .page-heading h1 {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .page-heading p {
+            font-size: 0.92rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* ===== BUCKET LIST GRID ===== */
+        .bucket-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .place-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1rem 1.1rem 1rem;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+            transition: transform var(--transition-med), box-shadow var(--transition-med);
+            animation: fadeInUp 0.4s ease both;
+        }
+
+        .place-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.15);
+        }
+
+        .place-card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .place-card .category {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .place-card .map-link {
+            font-size: 0.8rem;
+            color: var(--primary-dark);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .btn-remove {
+            margin-top: 0.6rem;
+            align-self: flex-start;
+            padding: 0.3rem 0.85rem;
+            border-radius: 999px;
+            border: 1.5px solid #f87171;
+            background: transparent;
+            color: #dc2626;
+            font-size: 0.78rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .btn-remove:hover {
+            background: #fef2f2;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+        }
+
+        .empty-state .icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .empty-state h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.4rem;
+        }
+
+        .empty-state p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 1.2rem;
+        }
+
+        .empty-state a {
+            display: inline-block;
+            padding: 0.6rem 1.4rem;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: #0b1120;
+            font-weight: 600;
+            font-size: 0.88rem;
+            letter-spacing: 0.05em;
+            box-shadow: 0 10px 28px rgba(6, 182, 212, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .empty-state a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 36px rgba(6, 182, 212, 0.55);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+<!-- ✅ Shared Navbar (injected by navbar.js) -->
+<script src="/navbar.js"></script>
+<script src="/js/i18n.js"></script>
+
+<div class="page-shell">
+    <div class="page-heading">
+        <h1 data-i18n="bucket_title">🧳 My Trip Bucket List</h1>
+        <p data-i18n="bucket_subtitle">Places you've saved from your trip plans. Click Remove to take a place off your list.</p>
+    </div>
+
+    <div id="tripContainer"></div>
+</div>
+
+<script>
+    function loadMyTrip() {
+        fetch("/api/my-places", { cache: "no-store" })
+            .then(function (res) { return res.ok ? res.json() : []; })
+            .catch(function () { return []; })
+            .then(function (places) {
+                renderMyTrip(places || []);
+            });
+    }
+
+    function renderMyTrip(places) {
+        const container = document.getElementById("tripContainer");
+        container.innerHTML = "";
+
+        if (places.length === 0) {
+            container.innerHTML = `
+            <div class="empty-state">
+                <div class="icon">🗺️</div>
+                <h2 data-i18n="no_places_saved">No places saved yet</h2>
+                <p data-i18n="no_places_desc">Go to Plan Trip, generate your itinerary, and tap the <strong>+</strong> button on any place to add it here.</p>
+                <a href="/plan-trip.html" data-i18n="plan_a_trip">Plan a Trip →</a>
+            </div>
+        `;
+            return;
+        }
+
+        const grid = document.createElement("div");
+        grid.className = "bucket-grid";
+
+        places.forEach(function (place, idx) {
+            const card = document.createElement("div");
+            card.className = "place-card";
+            card.style.animationDelay = (idx * 0.06) + "s";
+
+            card.innerHTML = `
+            <h3>${place.name || "Unnamed place"}</h3>
+            <div class="category">${place.category || ""}</div>
+            ${place.osmLink ? `<a class="map-link" href="${place.osmLink}" target="_blank" rel="noopener noreferrer">View on OpenStreetMap</a>` : ""}
+            <button class="btn-remove" onclick="removePlace(this, ${place.id})" data-i18n="remove">✕ Remove</button>
+        `;
+
+            grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+    }
+
+    function removePlace(btn, dbId) {
+        const card = btn.closest(".place-card");
+
+        if (!dbId) {
+            console.warn("[Remove] No DB id for this place.");
+            return;
+        }
+
+        // Disable the button while the API call is in-flight
+        btn.disabled = true;
+        btn.style.opacity = "0.5";
+
+        fetch("/api/my-places/" + dbId, { method: "DELETE" })
+            .then(function (res) {
+                if (!res.ok) {
+                    throw new Error("DELETE failed with status " + res.status);
+                }
+                console.log("[Remove] Deleted from DB:", "id=" + dbId);
+                if (card) {
+                    card.style.transition = "opacity 0.25s ease, transform 0.25s ease";
+                    card.style.opacity = "0";
+                    card.style.transform = "scale(0.93)";
+                    setTimeout(loadMyTrip, 260);
+                } else {
+                    loadMyTrip();
+                }
+            })
+            .catch(function (err) {
+                console.error("[Remove] API error — UI not changed:", err);
+                btn.disabled = false;
+                btn.style.opacity = "";
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", loadMyTrip);
+</script>
+
+</body>
+
+</html>

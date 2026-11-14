@@ -1,0 +1,34 @@
+# ---- Build output ----
+target/
+build/
+dist/
+*.class
+
+# ---- Node / frontend ----
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ---- React production build ----
+frontend/dist/
+
+# ---- IDE / editor ----
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# ---- OS files ----
+.DS_Store
+Thumbs.db
+
+# ---- Environment / secrets ----
+# Never commit real credentials. Keep local copies only.
+.env
+.env.*
+*.env
+application.properties
+**/application.properties

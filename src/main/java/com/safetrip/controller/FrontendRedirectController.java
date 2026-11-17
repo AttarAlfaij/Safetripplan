@@ -11,8 +11,22 @@ public class FrontendRedirectController {
     private final String frontendBaseUrl;
 
     public FrontendRedirectController(
-            @Value("${app.frontend-url:http://localhost:5173}") String frontendBaseUrl) {
-        this.frontendBaseUrl = stripTrailingSlash(frontendBaseUrl);
+            @Value("${frontend.url:}") String frontendUrl,
+            @Value("${app.frontend-url:}") String appFrontendUrl) {
+        String base = frontendUrl;
+        if (base == null || base.isBlank()) {
+            base = appFrontendUrl;
+        }
+        if (base == null || base.isBlank()) {
+            base = System.getenv("FRONTEND_URL");
+        }
+        if (base == null || base.isBlank()) {
+            base = System.getenv("APP_FRONTEND_URL");
+        }
+        if (base == null || base.isBlank()) {
+            base = "https://safe-trip-frontend.vercel.app";
+        }
+        this.frontendBaseUrl = stripTrailingSlash(base);
     }
 
     @GetMapping({

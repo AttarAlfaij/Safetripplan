@@ -17,13 +17,18 @@ public class TripPlace {
     private Double lon;
     private String osmLink;
 
-    /**
-     * GitHub user id (OAuth2User attribute "id") that owns this place.
-     * Always set server-side from the authenticated session — never trusted
-     * from client input — so users can only ever see/modify their own data.
-     */
+    /** Legacy user identifier for backwards compatibility */
     @Column(name = "github_id")
     private String githubId;
+
+    /**
+     * Database relationship linking each trip place to its persistent User owner.
+     * Ensures strict user data isolation.
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    @JsonIgnore
+    private User user;
 
     @Column(name = "day")
     private String day;
@@ -45,10 +50,17 @@ public class TripPlace {
     @JsonIgnore
     private Trip trip;
 
+    public TripPlace() {
+    }
+
     // ===== GETTERS & SETTERS =====
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -97,6 +109,14 @@ public class TripPlace {
 
     public void setGithubId(String githubId) {
         this.githubId = githubId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Trip getTrip() {

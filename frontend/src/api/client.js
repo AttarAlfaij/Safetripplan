@@ -1,8 +1,10 @@
 import { apiUrl } from "./config.js";
 
 export async function apiFetch(path, options = {}) {
+  const token = localStorage.getItem("token");
   const headers = {
     Accept: "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers || {}),
   };
 
@@ -12,6 +14,10 @@ export async function apiFetch(path, options = {}) {
     ...options,
     headers,
   });
+
+  if (response.status === 401 && token) {
+    window.dispatchEvent(new CustomEvent("stp:unauthorized"));
+  }
 
   return response;
 }

@@ -106,17 +106,28 @@ export default function Navbar() {
               </>
             ) : !loading ? (
               <div className="stp-auth-buttons">
+                <Link
+                  to="/login"
+                  className="stp-login-link"
+                  style={{
+                    background: "linear-gradient(135deg, #0e7490, #0891b2)",
+                    color: "#ffffff",
+                    border: "none",
+                  }}
+                >
+                  Sign In
+                </Link>
                 <a
                   href={oauthLoginUrl("github")}
                   className="stp-login-link"
                 >
-                  Login with GitHub
+                  GitHub
                 </a>
                 <a
                   href={oauthLoginUrl("google")}
                   className="stp-google-link"
                 >
-                  Continue with Google
+                  Google
                 </a>
               </div>
             ) : null}

@@ -2,77 +2,130 @@ package com.safetrip.service;
 
 import com.safetrip.model.User;
 import com.safetrip.repository.UserRepository;
+import com.safetrip.security.JwtUtil;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 @Service
 public class AuthService {
 
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    // In-memory session store: token -> userId
-    private final Map<String, Long> sessions = new ConcurrentHashMap<>();
-
-    public AuthService(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository,
+                       BCryptPasswordEncoder passwordEncoder,
+                       JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     /**
-     * Register a new user. Throws if email is already taken.
+     * Register a new user with email and password.
+     * Securely hashes password using BCrypt and generates JWT token.
      */
-    public String register(String email, String rawPassword) {
-        if (userRepository.existsByEmail(email)) {
+    @Transactional
+    public AuthResult register(String email, String rawPassword, String name) {
+        validateEmail(email);
+        validatePassword(rawPassword);
+
+        String cleanEmail = email.trim().toLowerCase();
+
+        if (userRepository.existsByEmail(cleanEmail)) {
             throw new IllegalArgumentException("An account with this email already exists.");
         }
+
         User user = new User();
-        user.setEmail(email);
+        user.setEmail(cleanEmail);
         user.setPassword(passwordEncoder.encode(rawPassword));
-        userRepository.save(user);
-        return createSession(user.getId());
+        user.setName(name != null && !name.isBlank() ? name.trim() : cleanEmail.split("@")[0]);
+        user.setProvider("LOCAL");
+
+        User savedUser = userRepository.save(user);
+        String token = jwtUtil.generateToken(savedUser);
+
+        return new AuthResult(token, savedUser);
     }
 
     /**
-     * Login an existing user. Throws if email not found or password wrong.
+     * Legacy register overload for backward compatibility
      */
-    public String login(String email, String rawPassword) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("No account found with this email."));
+    @Transactional
+    public String register(String email, String rawPassword) {
+        return register(email, rawPassword, null).token();
+    }
+
+    /**
+     * Authenticate an existing user and generate JWT token.
+     */
+    @Transactional(readOnly = true)
+    public AuthResult login(String email, String rawPassword) {
+        if (email == null || email.isBlank() || rawPassword == null || rawPassword.isBlank()) {
+            throw new IllegalArgumentException("Email and password are required.");
+        }
+
+        String cleanEmail = email.trim().toLowerCase();
+        User user = userRepository.findByEmail(cleanEmail)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
 
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-            throw new IllegalArgumentException("Incorrect password.");
+            throw new IllegalArgumentException("Invalid email or password.");
         }
-        return createSession(user.getId());
+
+        String token = jwtUtil.generateToken(user);
+        return new AuthResult(token, user);
     }
 
     /**
-     * Invalidate a session token.
+     * Invalidate/logout token.
      */
     public void logout(String token) {
-        sessions.remove(token);
+        // Stateless JWTs are primarily invalidated client-side, but this hook allows future blacklisting.
     }
 
     /**
-     * Get the user associated with a session token.
+     * Retrieve user from JWT token.
      */
+    @Transactional(readOnly = true)
     public Optional<User> getUserFromToken(String token) {
-        if (token == null)
+        if (token == null || !jwtUtil.validateToken(token)) {
             return Optional.empty();
-        Long userId = sessions.get(token);
-        if (userId == null)
-            return Optional.empty();
-        return userRepository.findById(userId);
+        }
+        Long userId = jwtUtil.extractUserId(token);
+        if (userId != null) {
+            Optional<User> user = userRepository.findById(userId);
+            if (user.isPresent()) {
+                return user;
+            }
+        }
+        String email = jwtUtil.extractEmail(token);
+        if (email != null) {
+            return userRepository.findByEmail(email);
+        }
+        return Optional.empty();
     }
 
-    private String createSession(Long userId) {
-        String token = UUID.randomUUID().toString();
-        sessions.put(token, userId);
-        return token;
+    private void validateEmail(String email) {
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Email is required.");
+        }
+        if (!EMAIL_PATTERN.matcher(email.trim()).matches()) {
+            throw new IllegalArgumentException("Please provide a valid email address.");
+        }
     }
+
+    private void validatePassword(String password) {
+        if (password == null || password.length() < 6) {
+            throw new IllegalArgumentException("Password must be at least 6 characters.");
+        }
+    }
+
+    public record AuthResult(String token, User user) {}
 }

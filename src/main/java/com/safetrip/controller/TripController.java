@@ -1,57 +1,63 @@
 package com.safetrip.controller;
 
 import com.safetrip.model.Trip;
-import com.safetrip.repository.TripRepository;
+import com.safetrip.model.User;
+import com.safetrip.service.TripService;
+import com.safetrip.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/trips")
 public class TripController {
 
-    private final TripRepository tripRepository;
+    private final TripService tripService;
+    private final UserService userService;
 
-    public TripController(TripRepository tripRepository) {
-        this.tripRepository = tripRepository;
+    public TripController(TripService tripService, UserService userService) {
+        this.tripService = tripService;
+        this.userService = userService;
     }
 
-    private String githubId(OAuth2User oAuth2User) {
-        Object id = oAuth2User.getAttribute("id");
-        return id != null ? id.toString() : oAuth2User.getAttribute("login");
+    private User getRequiredUser() {
+        User user = userService.getAuthenticatedUser();
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
+        }
+        return user;
     }
 
     @PostMapping
-    public Trip createTrip(@RequestBody Trip trip, @AuthenticationPrincipal OAuth2User oAuth2User) {
-        trip.setGithubId(githubId(oAuth2User));
-        return tripRepository.save(trip);
+    public Trip createTrip(@RequestBody Trip trip) {
+        User user = getRequiredUser();
+        return tripService.saveTrip(trip, user);
     }
+
     @GetMapping
-    public List<Trip> getAllTrips(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        return tripRepository.findByGithubId(githubId(oAuth2User));
+    public List<Trip> getAllTrips() {
+        User user = getRequiredUser();
+        return tripService.getTripsForUser(user);
     }
+
     @GetMapping("/{id}")
-    public Trip getTripById(@PathVariable Long id, @AuthenticationPrincipal OAuth2User oAuth2User) {
-        return tripRepository.findByIdAndGithubId(id, githubId(oAuth2User))
-                .orElseThrow(() -> new RuntimeException("Trip not found"));
+    public Trip getTripById(@PathVariable Long id) {
+        User user = getRequiredUser();
+        return tripService.getTripByIdForUser(id, user);
     }
+
     @DeleteMapping("/{id}")
-    public String deleteTrip(@PathVariable Long id, @AuthenticationPrincipal OAuth2User oAuth2User) {
-        Trip trip = tripRepository.findByIdAndGithubId(id, githubId(oAuth2User))
-                .orElseThrow(() -> new RuntimeException("Trip not found"));
-        tripRepository.delete(trip);
+    public String deleteTrip(@PathVariable Long id) {
+        User user = getRequiredUser();
+        tripService.deleteTripForUser(id, user);
         return "Trip deleted successfully!";
     }
+
     @PutMapping("/{id}")
-    public Trip updateTrip(@PathVariable Long id, @RequestBody Trip updatedTrip, @AuthenticationPrincipal OAuth2User oAuth2User) {
-        Trip trip = tripRepository.findByIdAndGithubId(id, githubId(oAuth2User))
-                .orElseThrow(() -> new RuntimeException("Trip not found"));
-
-        trip.setDestination(updatedTrip.getDestination());
-        trip.setMood(updatedTrip.getMood());
-
-        return tripRepository.save(trip);
+    public Trip updateTrip(@PathVariable Long id, @RequestBody Trip updatedTrip) {
+        User user = getRequiredUser();
+        return tripService.updateTripForUser(id, updatedTrip, user);
     }
-
 }

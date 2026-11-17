@@ -2,27 +2,32 @@ package com.safetrip.controller;
 
 import com.safetrip.model.User;
 import com.safetrip.service.AuthService;
+import com.safetrip.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, UserService userService) {
         this.authService = authService;
+        this.userService = userService;
     }
 
-    // ===== REGISTER =====
-    @PostMapping("/register")
+    // ===== REGISTER / SIGNUP =====
+    @PostMapping(path = {"/register", "/signup"})
     public ResponseEntity<?> register(@RequestBody Map<String, String> body) {
         String email = body.get("email");
         String password = body.get("password");
+        String name = body.get("name");
 
         if (email == null || email.isBlank()) {
             return ResponseEntity.badRequest().body(Map.of("error", "Email is required."));
@@ -32,8 +37,13 @@ public class AuthController {
         }
 
         try {
-            String token = authService.register(email.trim().toLowerCase(), password);
-            return ResponseEntity.ok(Map.of("token", token, "email", email.trim().toLowerCase()));
+            AuthService.AuthResult result = authService.register(email, password, name);
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", result.token());
+            response.put("email", result.user().getEmail());
+            response.put("userId", result.user().getId());
+            response.put("name", result.user().getName());
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
@@ -50,10 +60,15 @@ public class AuthController {
         }
 
         try {
-            String token = authService.login(email.trim().toLowerCase(), password);
-            return ResponseEntity.ok(Map.of("token", token, "email", email.trim().toLowerCase()));
+            AuthService.AuthResult result = authService.login(email, password);
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", result.token());
+            response.put("email", result.user().getEmail());
+            response.put("userId", result.user().getId());
+            response.put("name", result.user().getName());
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", e.getMessage()));
         }
     }
 
@@ -63,20 +78,23 @@ public class AuthController {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             authService.logout(authHeader.substring(7));
         }
-        return ResponseEntity.ok(Map.of("message", "Logged out."));
+        return ResponseEntity.ok(Map.of("message", "Logged out successfully."));
     }
 
-    // ===== ME (check session) =====
+    // ===== ME =====
     @GetMapping("/me")
-    public ResponseEntity<?> me(@RequestHeader(value = "Authorization", required = false) String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(401).body(Map.of("error", "Not authenticated."));
+    public ResponseEntity<?> me() {
+        User user = userService.getAuthenticatedUser();
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Not authenticated or token expired."));
         }
-        String token = authHeader.substring(7);
-        Optional<User> userOpt = authService.getUserFromToken(token);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.status(401).body(Map.of("error", "Invalid or expired session."));
-        }
-        return ResponseEntity.ok(Map.of("email", userOpt.get().getEmail()));
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", user.getId());
+        response.put("email", user.getEmail());
+        response.put("name", user.getName() != null ? user.getName() : user.getEmail());
+        response.put("avatarUrl", user.getAvatarUrl());
+        return ResponseEntity.ok(response);
     }
 }

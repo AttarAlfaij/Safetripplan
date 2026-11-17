@@ -4,7 +4,7 @@ import { useAuth } from "./AuthContext.jsx";
 
 export function useStartPlanning() {
   const navigate = useNavigate();
-  const { user, loading, loginWithProvider } = useAuth();
+  const { user, loading } = useAuth();
 
   return useCallback(
     (event) => {
@@ -17,9 +17,9 @@ export function useStartPlanning() {
       if (user) {
         navigate("/plan-trip");
       } else {
-        loginWithProvider("github");
+        navigate("/login");
       }
     },
-    [user, loading, loginWithProvider, navigate]
+    [user, loading, navigate]
   );
 }

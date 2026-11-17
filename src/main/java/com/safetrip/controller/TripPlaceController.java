@@ -1,11 +1,13 @@
 package com.safetrip.controller;
 
 import com.safetrip.model.TripPlace;
+import com.safetrip.model.User;
 import com.safetrip.service.TripService;
+import com.safetrip.service.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -14,27 +16,40 @@ import java.util.List;
 public class TripPlaceController {
 
     private final TripService tripService;
+    private final UserService userService;
 
-    public TripPlaceController(TripService tripService) {
+    public TripPlaceController(TripService tripService, UserService userService) {
         this.tripService = tripService;
+        this.userService = userService;
     }
 
-    // ✅ Add place — always saved under the logged-in GitHub user's id
+    private User getRequiredUser() {
+        User user = userService.getAuthenticatedUser();
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated");
+        }
+        return user;
+    }
+
+    // ✅ Add place — saved under the authenticated user's ID
     @PostMapping
-    public TripPlace savePlace(@RequestBody TripPlace place, @AuthenticationPrincipal OAuth2User oAuth2User) {
-        return tripService.savePlace(place, githubId(oAuth2User));
+    public TripPlace savePlace(@RequestBody TripPlace place) {
+        User user = getRequiredUser();
+        return tripService.savePlace(place, user);
     }
 
     // ✅ Get all places — only the current user's own data
     @GetMapping
-    public List<TripPlace> getAllPlaces(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        return tripService.getPlacesForUser(githubId(oAuth2User));
+    public List<TripPlace> getAllPlaces() {
+        User user = getRequiredUser();
+        return tripService.getPlacesForUser(user);
     }
 
     // ✅ Delete place — only if it belongs to the current user
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletePlace(@PathVariable Long id, @AuthenticationPrincipal OAuth2User oAuth2User) {
-        boolean deleted = tripService.deletePlaceForUser(id, githubId(oAuth2User));
+    public ResponseEntity<?> deletePlace(@PathVariable Long id) {
+        User user = getRequiredUser();
+        boolean deleted = tripService.deletePlaceForUser(id, user);
         if (!deleted) {
             return ResponseEntity.notFound().build();
         }
@@ -43,18 +58,9 @@ public class TripPlaceController {
 
     // ✅ Delete ALL places for the current user (Remove All button)
     @DeleteMapping
-    public ResponseEntity<?> deleteAllPlaces(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        tripService.deleteAllPlacesForUser(githubId(oAuth2User));
+    public ResponseEntity<?> deleteAllPlaces() {
+        User user = getRequiredUser();
+        tripService.deleteAllPlacesForUser(user);
         return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * Stable GitHub user identifier used for data isolation.
-     * This endpoint is already gated by Spring Security (/api/** requires
-     * authentication), so oAuth2User is never null in practice here.
-     */
-    private String githubId(OAuth2User oAuth2User) {
-        Object id = oAuth2User.getAttribute("id");
-        return id != null ? id.toString() : oAuth2User.getAttribute("login");
     }
 }

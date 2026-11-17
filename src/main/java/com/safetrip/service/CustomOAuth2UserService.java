@@ -15,24 +15,8 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Wraps Spring Security's default OAuth2 user-loading with Google-specific
- * account linking, while leaving GitHub's behavior completely untouched.
- *
- * GitHub:
- *   registrationId != "google" -> we return the exact same OAuth2User that
- *   Spring's default (parent) loader would have returned. No DB lookups, no
- *   attribute changes. This is functionally identical to the previous setup
- *   where no custom user service was registered at all.
- *
- * Google:
- *   We look up (or create) a row in the existing "users" table by email, so
- *   that a person signing in with Google multiple times always maps to the
- *   same account and no duplicates are created. We then inject a stable
- *   "id" attribute (the internal User.id) into the OAuth2User's attributes,
- *   matching the shape GitHub already provides (an "id" attribute), so the
- *   existing per-user data isolation logic in PlanTripController /
- *   TripPlaceController (which reads attribute "id") keeps working
- *   unchanged for both providers.
+ * Custom OAuth2 user service for GitHub and Google standard OAuth2 flows.
+ * Maps each OAuth account to a persistent User record in the database.
  */
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
@@ -47,37 +31,79 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
-
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        if (!"google".equals(registrationId)) {
-            // Not Google (i.e. GitHub) — hand back exactly what the default
-            // loader returned. GitHub flow is unaffected.
-            return oAuth2User;
+
+        if ("google".equalsIgnoreCase(registrationId)) {
+            String email = oAuth2User.getAttribute("email");
+            if (email == null || email.isBlank()) {
+                throw new OAuth2AuthenticationException("Google account has no email address available.");
+            }
+            final String cleanEmail = email.trim().toLowerCase();
+            String name = oAuth2User.getAttribute("name");
+            String picture = oAuth2User.getAttribute("picture");
+
+            User user = userRepository.findByEmail(cleanEmail)
+                    .orElseGet(() -> {
+                        User newUser = new User();
+                        newUser.setEmail(cleanEmail);
+                        newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+                        newUser.setName(name != null ? name : cleanEmail);
+                        newUser.setAvatarUrl(picture);
+                        newUser.setProvider("GOOGLE");
+                        return userRepository.save(newUser);
+                    });
+
+            Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
+            attributes.put("id", user.getId().toString());
+            attributes.put("userId", user.getId());
+
+            return new DefaultOAuth2User(oAuth2User.getAuthorities(), attributes, "email");
         }
 
+        // GitHub provider
+        Object ghIdObj = oAuth2User.getAttribute("id");
+        String ghId = ghIdObj != null ? ghIdObj.toString() : null;
+        String login = oAuth2User.getAttribute("login");
         String email = oAuth2User.getAttribute("email");
-        if (email == null || email.isBlank()) {
-            throw new OAuth2AuthenticationException("Google account has no email address available.");
+        String name = oAuth2User.getAttribute("name");
+        String avatarUrl = oAuth2User.getAttribute("avatar_url");
+
+        String userEmail;
+        if (email != null && !email.isBlank()) {
+            userEmail = email.trim().toLowerCase();
+        } else if (ghId != null) {
+            userEmail = "gh_" + ghId + "@github.user";
+        } else if (login != null) {
+            userEmail = login.toLowerCase() + "@github.user";
+        } else {
+            userEmail = "gh_" + UUID.randomUUID() + "@github.user";
         }
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(userEmail)
                 .orElseGet(() -> {
                     User newUser = new User();
-                    newUser.setEmail(email);
-                    // OAuth-created accounts don't have a password. The "password"
-                    // column is NOT NULL, so we store a random, never-guessable
-                    // bcrypt hash. It cannot be produced by any real password, so
-                    // the existing email/password login path simply won't match it —
-                    // that path is otherwise untouched.
+                    newUser.setEmail(userEmail);
                     newUser.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+                    newUser.setName(name != null ? name : (login != null ? login : userEmail));
+                    newUser.setAvatarUrl(avatarUrl);
+                    newUser.setProvider("GITHUB");
                     return userRepository.save(newUser);
                 });
 
         Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
-        // Provider-agnostic identity, mirrors GitHub's "id" attribute so
-        // downstream code that isolates data by attribute "id" needs no changes.
+        // Provide stable user id mapped to database User.id
         attributes.put("id", user.getId().toString());
+        attributes.put("userId", user.getId());
+        if (!attributes.containsKey("email")) {
+            attributes.put("email", user.getEmail());
+        }
 
-        return new DefaultOAuth2User(oAuth2User.getAuthorities(), attributes, "email");
+        String nameAttributeKey = userRequest.getClientRegistration()
+                .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+        if (nameAttributeKey == null || nameAttributeKey.isBlank()) {
+            nameAttributeKey = "id";
+        }
+
+        return new DefaultOAuth2User(oAuth2User.getAuthorities(), attributes, nameAttributeKey);
     }
 }

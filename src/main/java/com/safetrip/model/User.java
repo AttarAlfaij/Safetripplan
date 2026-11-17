@@ -1,5 +1,6 @@
 package com.safetrip.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -15,10 +16,28 @@ public class User {
     private String email;
 
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(name = "provider")
+    private String provider; // "LOCAL", "GOOGLE", "GITHUB"
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    public User() {
+    }
+
+    public User(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 
     @PrePersist
     protected void onCreate() {
@@ -29,6 +48,10 @@ public class User {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -47,7 +70,35 @@ public class User {
         this.password = password;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

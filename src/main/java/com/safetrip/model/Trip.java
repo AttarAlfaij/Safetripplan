@@ -3,6 +3,7 @@ package com.safetrip.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "trip")
 public class Trip {
 
     @Id
@@ -12,12 +13,28 @@ public class Trip {
     private String destination;
     private String mood;
 
-    /** GitHub user id (OAuth2User attribute "id") that owns this trip. */
+    /** Legacy user identifier for backwards compatibility */
+    @Column(name = "github_id")
     private String githubId;
+
+    /**
+     * Database relationship linking each trip to its persistent User owner.
+     * Ensures strict user data isolation.
+     */
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public Trip() {
+    }
 
     // Getter for id
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     // Getter and Setter for destination
@@ -44,5 +61,13 @@ public class Trip {
 
     public void setGithubId(String githubId) {
         this.githubId = githubId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

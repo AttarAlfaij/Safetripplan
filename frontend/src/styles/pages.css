@@ -581,76 +581,367 @@
   }
 }
 
-/* ---------- Login ---------- */
+/* ---------- Login & Signup ---------- */
 .login-page {
-  font-family: Arial, sans-serif;
-  background: radial-gradient(circle, #dff6ff, #f5faff);
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: radial-gradient(circle at 50% 20%, #e0f2fe 0%, #f0fdf4 40%, #f8fafc 100%);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1.5rem;
+  padding: 2rem 1rem;
 }
 
+.login-page .modern-auth-card,
 .login-page .auth-card {
-  background: white;
-  padding: 40px;
-  border-radius: 16px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  width: 350px;
-}
-
-.login-page .panel-title {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.login-page .panel-sub {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 25px;
-}
-
-.login-page .github-btn {
-  display: block;
-  padding: 12px;
-  border-radius: 8px;
-  background: #24292e;
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
-  transition: 0.3s;
-}
-
-.login-page .github-btn:hover {
-  background: black;
-  transform: translateY(-2px);
-}
-
-.login-page .google-btn {
-  display: block;
-  padding: 12px;
-  border-radius: 8px;
   background: #ffffff;
-  color: #3c4043;
-  border: 1px solid #dadce0;
+  padding: 2rem 2.25rem;
+  border-radius: 20px;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.03);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  width: 100%;
+  max-width: 440px;
+  text-align: left;
+  box-sizing: border-box;
+  animation: authCardFadeIn 0.35s ease-out;
+}
+
+@keyframes authCardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.auth-logo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(6, 182, 212, 0.1);
+  color: #0e7490;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-decoration: none;
-  font-weight: bold;
-  transition: 0.3s;
-  margin-top: 12px;
+  margin-bottom: 0.75rem;
+  transition: background 0.2s ease;
 }
 
+.auth-logo-pill:hover {
+  background: rgba(6, 182, 212, 0.18);
+}
+
+.auth-logo-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: #06b6d4;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.25);
+}
+
+.auth-main-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 0.35rem 0;
+  letter-spacing: -0.02em;
+}
+
+.auth-main-sub {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+  line-height: 1.45;
+}
+
+/* Tabs */
+.auth-tabs {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+  gap: 4px;
+}
+
+.auth-tab-btn {
+  flex: 1;
+  padding: 0.55rem 0.75rem;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #64748b;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.auth-tab-btn.active {
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+/* Alerts */
+.auth-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+}
+
+.auth-alert-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.auth-alert-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+}
+
+/* Form inputs */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.label-with-action {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-toggle-pw {
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #0891b2;
+  cursor: pointer;
+  padding: 0;
+}
+
+.btn-toggle-pw:hover {
+  text-decoration: underline;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: #0f172a;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #06b6d4;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.18);
+}
+
+.form-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Submit button */
+.auth-submit-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  margin-top: 0.35rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0e7490, #0891b2);
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 12px rgba(8, 145, 178, 0.25);
+}
+
+.auth-submit-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #155e75, #0e7490);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(8, 145, 178, 0.35);
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.submitting-spinner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spinner-dot {
+  width: 8px;
+  height: 8px;
+  border: 2px solid #ffffff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Divider */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.25rem 0;
+  color: #94a3b8;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.auth-divider span {
+  padding: 0 0.75rem;
+}
+
+/* OAuth buttons */
+.oauth-button-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.oauth-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.google-oauth-btn,
+.login-page .google-btn {
+  background: #ffffff;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
+}
+
+.google-oauth-btn:hover,
 .login-page .google-btn:hover {
-  background: #f7f8f8;
-  transform: translateY(-2px);
+  background: #f8fafc;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
 }
 
-.login-page .msg {
-  margin-top: 15px;
-  font-size: 12px;
-  color: #777;
+.github-oauth-btn,
+.login-page .github-btn {
+  background: #1e293b;
+  color: #ffffff;
+  border: 1px solid #1e293b;
+}
+
+.github-oauth-btn:hover,
+.login-page .github-btn:hover {
+  background: #0f172a;
+  border-color: #0f172a;
+  transform: translateY(-1px);
+}
+
+.auth-card-footer {
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: #64748b;
+}
+
+.auth-link-button {
+  background: none;
+  border: none;
+  color: #0891b2;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.auth-link-button:hover {
+  text-decoration: underline;
+}
+
+.back-home-link-wrap {
+  margin-top: 0.85rem;
+}
+
+.back-home-link {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 0.78rem;
+  transition: color 0.2s ease;
+}
+
+.back-home-link:hover {
+  color: #475569;
 }
 
 /* ---------- Plan Trip ---------- */
@@ -1557,4 +1848,29 @@
 .about-page .footer-bottom {
   border-top-color: rgba(37, 99, 235, 0.14);
   color: #7c8aa0;
+}
+
+.plan-trip-page .place-links,
+.my-trip-page .place-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.35rem;
+}
+
+.plan-trip-page .place-link-item,
+.my-trip-page .place-link-item {
+  font-size: 0.8rem;
+  color: var(--primary-dark);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.plan-trip-page .place-link-item:hover,
+.my-trip-page .place-link-item:hover {
+  color: var(--primary);
 }

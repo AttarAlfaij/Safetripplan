@@ -19,7 +19,11 @@ const MOODS = [
 const DEFAULT_FORM = { city: "", mood: "", days: "3" };
 
 function getUserId() {
-  return localStorage.getItem("userEmail") || "guest";
+  return (
+    localStorage.getItem("userId") ||
+    localStorage.getItem("userEmail") ||
+    "guest"
+  );
 }
 
 function getStorageKeys() {
@@ -74,6 +78,36 @@ function getDragAfterElement(elements, y) {
   ).element;
 }
 
+
+function getValidCoords(place) {
+  if (!place) return null;
+  const lat = parseFloat(place.lat);
+  const lon = parseFloat(place.lon);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  return { lat, lon };
+}
+
+function buildGoogleMapsUrl(place, city) {
+  const name = (place && place.name) || "";
+  const coords = getValidCoords(place);
+  if (coords) {
+    const q = `${name},${coords.lat},${coords.lon}`;
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+  }
+  const q = [name, city].filter(Boolean).join(" ");
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+}
+
+function buildOpenStreetMapUrl(place) {
+  const coords = getValidCoords(place);
+  if (!coords) return "";
+  return `https://www.openstreetmap.org/?mlat=${coords.lat}&mlon=${coords.lon}#map=16/${coords.lat}/${coords.lon}`;
+}
+
+function buildPhotosUrl(place, city) {
+  const q = [(place && place.name) || "", city].filter(Boolean).join(" ");
+  return `https://www.google.com/search?tbm=isch&q=${encodeURIComponent(q)}`;
+}
 function Placeholder() {
   return (
     <article
@@ -649,17 +683,34 @@ export default function PlanTrip() {
                           <div className="place-category">
                             {place.category || ""}
                           </div>
-                          {place.osmLink ? (
-                            <div className="place-link">
+                          <div className="place-links">
+                            <a
+                              className="place-link-item"
+                              href={buildGoogleMapsUrl(place, city)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <span aria-hidden="true"></span> {t("view_on_google_maps")}
+                            </a>
+                            {getValidCoords(place) ? (
                               <a
-                                href={place.osmLink}
+                                className="place-link-item"
+                                href={buildOpenStreetMapUrl(place)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                {t("view_on_map")}
+                                <span aria-hidden="true"></span> {t("view_on_map")}
                               </a>
-                            </div>
-                          ) : null}
+                            ) : null}
+                            <a
+                              className="place-link-item"
+                              href={buildPhotosUrl(place, city)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <span aria-hidden="true"></span> {t("view_photos")}
+                            </a>
+                          </div>
                           <button
                             type="button"
                             className={

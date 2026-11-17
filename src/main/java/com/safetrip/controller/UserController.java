@@ -1,9 +1,10 @@
 package com.safetrip.controller;
 
+import com.safetrip.model.User;
+import com.safetrip.service.UserService;
 import org.springframework.http.CacheControl;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,33 +16,35 @@ import java.util.Map;
 @RequestMapping("/api")
 public class UserController {
 
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
     @GetMapping("/user")
-    public ResponseEntity<?> getUser(@AuthenticationPrincipal OAuth2User oAuth2User) {
-        if (oAuth2User == null) {
-            return ResponseEntity.status(401)
+    public ResponseEntity<?> getUser() {
+        User user = userService.getAuthenticatedUser();
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .cacheControl(CacheControl.noStore().mustRevalidate())
                     .body(Map.of("error", "Not authenticated"));
         }
 
-        // GitHub attributes ("login", "avatar_url") — unchanged from before.
-        String username = oAuth2User.getAttribute("login");
-        String avatarUrl = oAuth2User.getAttribute("avatar_url");
-        String name = oAuth2User.getAttribute("name");
+        String displayName = user.getName() != null && !user.getName().isBlank()
+                ? user.getName()
+                : user.getEmail();
 
-        // Google doesn't have a "login" attribute; fall back to its own
-        // attribute names ("email", "picture") only when GitHub's aren't present.
-        if (username == null) {
-            username = oAuth2User.getAttribute("email");
-            avatarUrl = oAuth2User.getAttribute("picture");
-        }
-        if (name == null) {
-            name = username;
-        }
+        String jwtToken = userService.generateTokenForUser(user);
 
         Map<String, Object> userInfo = new HashMap<>();
-        userInfo.put("username", username);
-        userInfo.put("avatarUrl", avatarUrl);
-        userInfo.put("name", name);
+        userInfo.put("id", user.getId());
+        userInfo.put("userId", user.getId());
+        userInfo.put("email", user.getEmail());
+        userInfo.put("username", user.getEmail());
+        userInfo.put("name", displayName);
+        userInfo.put("avatarUrl", user.getAvatarUrl());
+        userInfo.put("token", jwtToken);
 
         return ResponseEntity.ok()
                 .cacheControl(CacheControl.noStore().mustRevalidate())

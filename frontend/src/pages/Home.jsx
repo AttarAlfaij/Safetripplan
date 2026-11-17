@@ -253,26 +253,26 @@ export default function Home() {
             <div className="about-visual" aria-hidden="true">
               <div className="about-card">
 
-                <div className="about-badge">
-                  {t("live_trip_overview")}
-                </div>
+{/*                 <div className="about-badge"> */}
+{/*                   {t("live_trip_overview")} */}
+{/*                 </div> */}
 
-                <div className="about-stat">
-                  <span>{t("avg_planning_time")}</span>
-                  <strong>12 min</strong>
-                </div>
+{/*                 <div className="about-stat"> */}
+{/*                   <span>{t("avg_planning_time")}</span> */}
+{/*                   <strong>12 min</strong> */}
+{/*                 </div> */}
 
-                <div className="about-stat">
-                  <span>{t("trips_organized")}</span>
-                  <strong>10k+</strong>
-                </div>
+{/*                 <div className="about-stat"> */}
+{/*                   <span>{t("trips_organized")}</span> */}
+{/*                   <strong>10k+</strong> */}
+{/*                 </div> */}
 
-                <div className="about-stat">
-                  <span>{t("traveler_satisfaction")}</span>
-                  <strong>4.9/5</strong>
-                </div>
+{/*                 <div className="about-stat"> */}
+{/*                   <span>{t("traveler_satisfaction")}</span> */}
+{/*                   <strong>4.9/5</strong> */}
+{/*                 </div> */}
 
-                <div className="about-ribbon" />
+                <div className="about-ribbon" /><span> Travel Smartly</span>
               </div>
             </div>
 
